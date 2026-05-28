@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>intenti&ouml;n</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #B2B9BC; /* Blue sky hints */
+            overflow: hidden;
+            font-family: sans-serif;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            z-index: 0;
+        }
+        .fogOne, .fogTwo, .fogThree, .fogFour, .fogFive {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            animation: fadeInOut 10s infinite;
+            pointer-events: none; /* Allow mouse events to pass through to elements below */
+            z-index: 5; /* Lower than intention but above body */
+        }
+        .fogOne { background: url('vecteezy_white-fog-illustration_24065516-bottom-low.png') no-repeat center center; animation-duration: 3s; }
+        .fogTwo { background: url('vecteezy_white-fog-illustration_24065530-bottom-risen.png') no-repeat center center; animation-duration: 4s; }
+        .fogThree { background: url('vecteezy_white-fog-illustration_24065547-centre.png') no-repeat center center; animation-duration: 5s; }
+        .fogFour { background: url('vecteezy_white-fog-illustration_24065523-corner-bottom-right.png') no-repeat center center; animation-duration: 6s; }
+        .fogFive { background: url('vecteezy_white-fog-illustration_24065528-diagonal-down-right.png') no-repeat center center; animation-duration: 7s; }
+
+        @keyframes fadeInOut {
+            0%,100% { opacity: 0; }
+            50%     { opacity: 1; }
+        }
+
+        #menu {
+            position: absolute;
+            left: 2%;
+            top: 1%;
+            opacity: 0;
+            transition: opacity 3s;
+            cursor: pointer;
+            z-index: 100;
+            width: 15vw; /* 25% of viewport width */
+            height: 15vw; /* Make it a square */
+            /*border: 2px solid transparent;*/
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        #menu img {
+            position: absolute;
+            top: -35%;
+            left: -20%;
+            width: calc(25vw - 10px); /* Account for padding */
+            height: calc(25vw - 10px); /* Match container height minus padding */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            object-fit: contain; /* Ensure the image maintains its aspect ratio */
+        }
+
+        /* VT100 Terminal Emulator Styles */
+        #terminal-container {
+            position: absolute;
+            top: 35%;
+            /*transform: translateY(-15%);*/
+            right: 5%;
+            width: 90vw; /* 2/3 of viewport width */
+            height: calc(65vw * 9 / 16); /* 16:9 aspect ratio */
+            background-color: #000;
+            opacity: 0.4;
+            border: 2px solid #00FF00;
+            border-radius: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-family: "Courier New", monospace;
+            overflow-y: auto; /* Changed from hidden to auto to enable vertical scrolling */
+            z-index: 600;
+        }
+
+        #terminal-output {
+            color: #00FF00; /* Classic green screen color */
+            font-size: 1vw;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 0.8em;
+            height: 1em;
+            background-color: #00FF00;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        /* Showcase bar */
+        #showcase-bar {
+            position: fixed;
+            top: 8px;
+            right: 8px;
+            z-index: 2500;
+            font-family: sans-serif;
+            font-size: 0.85vw;
+            opacity: 0.75;
+            transition: opacity 0.3s;
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            padding: 6px 10px;
+        }
+        #showcase-bar:hover { opacity: 1; }
+
+        .showcase-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+            line-height: 1.8;
+            white-space: nowrap;
+            color: #3F5965;
+        }
+        .showcase-mission {
+            color: #3F5965;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            max-width: 14em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .showcase-mission:hover { text-decoration: underline; }
+        .showcase-status {
+            font-size: 0.75em;
+            font-weight: bold;
+            padding: 1px 5px;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+        .showcase-status.complete { color: #2ea043; }
+        .showcase-status.in-progress { color: #d29922; }
+        .showcase-status.not-started { color: #8b949e; }
+        .showcase-status.blocked { color: #f85149; }
+        .showcase-status.unavailable { color: #8b949e; font-style: italic; }
+        .showcase-transforms { color: #57606a; font-size: 0.85em; }
+        .showcase-default-btn {
+            color: #3F5965;
+            cursor: pointer;
+            font-size: 0.8em;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+        }
+        .showcase-default-btn.is-default {
+            font-weight: bold;
+            text-decoration: none;
+            cursor: default;
+        }
+        #showcase-show-all {
+            display: block;
+            margin-top: 4px;
+            color: #3F5965;
+            font-size: 0.8em;
+            text-align: right;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+            text-decoration: underline;
+        }
+        #showcase-show-all:hover { font-weight: bold; }
+
+        /* Mission lightbox */
+        #mission-lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 5000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #mission-lightbox.active {
+            display: flex;
+        }
+
+        #mission-lightbox .mission-content {
+            background: #fff;
+            color: #333;
+            max-width: 80vw;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+            font-family: sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        #mission-lightbox .mission-links {
+            margin-top: 16px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        #mission-lightbox .mission-link-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        #mission-lightbox .mission-link-item:hover {
+            opacity: 1;
+        }
+
+        #mission-lightbox .mission-link-item img,
+        #mission-lightbox .mission-link-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        #mission-lightbox .mission-pages-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #fff;
+            text-decoration: underline;
+            font-size: 14px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        #mission-lightbox .mission-pages-link:hover {
+            opacity: 1;
+        }
+
+        #mission-lightbox .mission-pages-link .external-icon {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        /* Screenshot showcase */
+        #screenshot-showcase {
+            position: absolute;
+            top: 18%;
+            left: 10vw;
+            z-index: 800;
+            text-align: left;
+            pointer-events: auto;
+        }
+
+        .screenshot-item {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            max-width: 90vw;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .screenshot-item:hover {
+            opacity: 0.8;
+        }
+
+        .screenshot-item img.screenshot-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+
+        .screenshot-item .gh-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .screenshot-item:hover .gh-badge {
+            opacity: 1;
+        }
+
+        /* Lightbox overlay */
+        #lightbox-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 5000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #lightbox-overlay.active {
+            display: flex;
+        }
+
+        #lightbox-overlay img.lightbox-img {
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+
+        #lightbox-overlay .lightbox-links {
+            margin-top: 16px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        #lightbox-overlay .lightbox-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        #lightbox-overlay .lightbox-link:hover {
+            opacity: 1;
+        }
+
+        #lightbox-overlay .lightbox-link img {
+            width: 20px;
+            height: 20px;
+            filter: invert(1);
+        }
+
+        #lightbox-overlay .lightbox-pages-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #fff;
+            text-decoration: underline;
+            font-size: 14px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        #lightbox-overlay .lightbox-pages-link:hover {
+            opacity: 1;
+        }
+
+        #lightbox-overlay .lightbox-pages-link .external-icon {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        #giscus-container {
+            position: absolute;
+            width: 100%;
+            left: 54%;
+            transform: translateX(-50%);
+            top: 11%;
+            z-index: 1000;
+            opacity: 0.9;
+            padding: 2% 2%;
+            box-sizing: border-box;
+            max-height: 80vh;
+            overflow-y: auto;
+            background-color: rgba(180, 220, 255, 0.5);
+        }
+        @media (orientation: landscape) {
+            #giscus-container {
+                width: 50%;
+            }
+        }
+
+        /* Show-all grid overlay */
+        #grid-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 6000;
+            justify-content: center;
+            align-items: center;
+            padding: 4vw;
+            box-sizing: border-box;
+        }
+        #grid-overlay.active { display: flex; }
+        #grid-close {
+            position: absolute;
+            top: 16px;
+            right: 24px;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 6001;
+            background: none;
+            border: none;
+            font-family: inherit;
+            opacity: 0.7;
+        }
+        #grid-close:hover { opacity: 1; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2vw;
+            max-width: 90vw;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        @media (max-width: 768px), (orientation: portrait) {
+            .grid-container { grid-template-columns: repeat(2, 1fr); }
+        }
+        .grid-cell {
+            background: #1a1a2e;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s, transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .grid-cell:hover { border-color: #3F5965; transform: scale(1.02); }
+        .grid-cell.is-default { border-color: #2ea043; }
+        .grid-cell-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            background: #111;
+            display: block;
+        }
+        .grid-cell-info {
+            padding: 8px 12px;
+            color: #ccc;
+            font-size: 13px;
+        }
+        .grid-cell-label { font-weight: bold; color: #fff; margin-bottom: 2px; }
+        .grid-cell-mission { color: #aaa; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .grid-cell-cta {
+            background: #2ea043;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            aspect-ratio: 16/9;
+        }
+        .grid-cell-cta:hover { background: #3fb950; }
+    </style>
+</head>
+<body>
+
+<div id="menu">
+    <img src="brand/mesh/intention-mesh-transparent-steel.png" alt="Intention Mesh Steel" id="menu-img-1">
+    <img src="brand/mesh/intention-mesh-transparent-black.png" alt="Intention Mesh White" id="menu-img-2">
+</div>
+
+<!-- Showcase bar (replaces mission-link) -->
+<div id="showcase-bar"></div>
+
+<!-- Mission lightbox -->
+<div id="mission-lightbox">
+    <div class="mission-content" id="mission-content">Loading MISSION.md...</div>
+    <div class="mission-links" id="mission-links">
+        <a class="mission-pages-link" id="mission-pages-link" href="#" target="_blank" rel="noopener">
+            <span>Visit website</span>
+            <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <a class="mission-link-item" id="mission-repo-link" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" width="20" height="20" fill="white"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            <span>View MISSION.md</span>
+        </a>
+    </div>
+</div>
+
+<div class="fogOne"></div>
+<div class="fogTwo"></div>
+<div class="fogThree"></div>
+<div class="fogFour"></div>
+<div class="fogFive"></div>
+
+<!-- Screenshot showcase -->
+<div id="screenshot-showcase"></div>
+
+<!-- Lightbox overlay -->
+<div id="lightbox-overlay">
+    <img class="lightbox-img" src="" alt="">
+    <div class="lightbox-links">
+        <a class="lightbox-pages-link" href="" target="_blank" rel="noopener">
+            <span>Visit website</span>
+            <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <a class="lightbox-link" href="" target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" width="20" height="20" fill="white"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+            <span>View repository</span>
+        </a>
+    </div>
+</div>
+
+<!-- VT100 Terminal Emulator -->
+<div id="terminal-container">
+    <div id="terminal-output"></div>
+    <span class="cursor"></span>
+</div>
+
+<div id="random-line"></div>
+
+<!-- ─────────────── giscus embed ─────────────── -->
+<div id="giscus-container"></div>
+<!-- ────────────────────────────────────────────── -->
+
+<!-- Show-all grid overlay -->
+<div id="grid-overlay">
+    <button id="grid-close">&times;</button>
+    <div class="grid-container" id="grid-container"></div>
+</div>
+
+<script>
+    console.log('Script started executing');
+
+    // ─── W1: Repository config (loaded from agentic-lib-repositories.toml) ──
+    var OWNER = 'xn-intenton-z2a';
+    var SHOWCASE_REPOS = []; // populated by loadRepoConfig()
+
+    function parseRepoToml(text) {
+        // Parse owner
+        var ownerMatch = text.match(/\[owner\][\s\S]*?name\s*=\s*"([^"]*)"/);
+        if (ownerMatch) OWNER = ownerMatch[1];
+
+        // Parse [[repositories]] entries
+        var repos = [];
+        var blocks = text.split(/^\[\[repositories\]\]/m);
+        for (var i = 1; i < blocks.length; i++) {
+            var block = blocks[i];
+            var get = function(key) {
+                var m = block.match(new RegExp('^\\s*' + key.replace('-', '\\-') + '\\s*=\\s*"([^"]*)"', 'm'));
+                return m ? m[1] : '';
+            };
+            var getBool = function(key) {
+                var m = block.match(new RegExp('^\\s*' + key + '\\s*=\\s*(true|false)', 'm'));
+                return m ? m[1] === 'true' : false;
+            };
+            repos.push({
+                name: get('name'),
+                label: get('label'),
+                repoId: get('repo-id'),
+                categoryId: get('category-id'),
+                giscus: getBool('giscus'),
+            });
+        }
+        return repos;
+    }
+
+    function loadRepoConfig() {
+        return fetch('agentic-lib-repositories.toml')
+            .then(function(r) { return r.ok ? r.text() : ''; })
+            .then(function(text) {
+                if (text) {
+                    SHOWCASE_REPOS = parseRepoToml(text);
+                    console.log('Loaded ' + SHOWCASE_REPOS.length + ' repos from agentic-lib-repositories.toml');
+                }
+                if (SHOWCASE_REPOS.length === 0) {
+                    // Fallback if toml fails to load
+                    console.warn('No repos loaded from toml — using hardcoded fallback');
+                    SHOWCASE_REPOS = [
+                        { name: 'repository0', label: 'repository0', repoId: 'R_kgDON6E8ZA', categoryId: 'DIC_kwDON6E8ZM4CpwzM', giscus: true },
+                    ];
+                }
+            })
+            .catch(function(err) {
+                console.error('Failed to load repo config:', err);
+                SHOWCASE_REPOS = [
+                    { name: 'repository0', label: 'repository0', repoId: 'R_kgDON6E8ZA', categoryId: 'DIC_kwDON6E8ZM4CpwzM', giscus: true },
+                ];
+            });
+    }
+
+    // ─── W2: localStorage for default repo ──────────────────────────
+    var currentDefault = localStorage.getItem('intention-showcase-default') || 'repository0';
+
+    // ─── Metadata cache ─────────────────────────────────────────────
+    var repoMeta = {}; // { repoName: { missionName, missionText, status, transforms, discussionTerm } }
+
+    // ─── W3: Fetch per-repo metadata (batched) ─────────────────────
+    function fetchRepoMeta(repoName) {
+        if (repoMeta[repoName]) return Promise.resolve(repoMeta[repoName]);
+
+        var meta = { missionName: repoName, missionText: null, status: 'unavailable', transforms: 0, discussionTerm: 'Talk to the repository' };
+
+        var listingP = fetch('https://api.github.com/repos/' + OWNER + '/' + repoName + '/contents/?ref=main')
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(files) {
+                var names = Array.isArray(files) ? files.map(function(f) { return f.name; }) : [];
+                if (names.indexOf('MISSION_COMPLETE.md') >= 0) meta.status = 'complete';
+                else if (names.indexOf('MISSION_FAILED.md') >= 0) meta.status = 'blocked';
+                else if (names.indexOf('MISSION.md') >= 0) meta.status = 'in-progress';
+                else meta.status = 'not-started';
+            })
+            .catch(function() { meta.status = 'unavailable'; });
+
+        var missionP = fetch('https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/main/MISSION.md')
+            .then(function(r) { return r.ok ? r.text() : null; })
+            .then(function(text) {
+                if (text) meta.missionText = text;
+            })
+            .catch(function() {});
+
+        // Fetch agentic-lib.toml for mission seed name and transform count
+        var tomlP = fetch('https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/main/agentic-lib.toml')
+            .then(function(r) { return r.ok ? r.text() : ''; })
+            .then(function(text) {
+                // Extract [init].mission — the seed name like "7-kyu-understand-fizz-buzz"
+                // Must match under [init] section, not [paths] which has mission = "MISSION.md"
+                var initSection = text.match(/\[init\]([\s\S]*?)(?=\n\[|$)/);
+                if (initSection) {
+                    var missionMatch = initSection[1].match(/^\s*mission\s*=\s*"([^"]*)"/m);
+                    if (missionMatch && missionMatch[1] !== 'MISSION.md') meta.missionName = missionMatch[1];
+                }
+            })
+            .catch(function() {});
+
+        var stateP = fetch('https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/agentic-lib-logs/agentic-lib-state.toml')
+            .then(function(r) { return r.ok ? r.text() : ''; })
+            .then(function(text) {
+                var m = text.match(/cumulative-transforms\s*=\s*(\d+)/);
+                if (m) meta.transforms = parseInt(m[1], 10);
+            })
+            .catch(function() {});
+
+        // Discussion term is always 'Talk to the repository' — the bot creates discussions
+        // with this title. The REST API doesn't support reliable newest-first sorting,
+        // and the repo has many discussions with this title, so we use the default.
+        var discussionP = Promise.resolve();
+
+        return Promise.all([listingP, missionP, tomlP, stateP, discussionP]).then(function() {
+            repoMeta[repoName] = meta;
+            return meta;
+        });
+    }
+
+    function fetchAllMeta() {
+        return Promise.all(SHOWCASE_REPOS.map(function(r) { return fetchRepoMeta(r.name); }));
+    }
+
+    // ─── W4: Showcase bar ───────────────────────────────────────────
+    function renderShowcaseBar() {
+        var bar = document.getElementById('showcase-bar');
+        bar.innerHTML = '';
+        SHOWCASE_REPOS.forEach(function(repo) {
+            var meta = repoMeta[repo.name] || { missionName: repo.label, status: 'unavailable', transforms: 0 };
+            var row = document.createElement('div');
+            row.className = 'showcase-row';
+            row.setAttribute('data-repo', repo.name);
+
+            var missionLink = document.createElement('a');
+            missionLink.className = 'showcase-mission';
+            missionLink.textContent = meta.missionName;
+            missionLink.title = 'View MISSION.md for ' + repo.label;
+            missionLink.href = '#';
+            missionLink.addEventListener('click', (function(rn) {
+                return function(e) { e.preventDefault(); openMissionLightbox(rn); };
+            })(repo.name));
+
+            var statusSpan = document.createElement('span');
+            statusSpan.className = 'showcase-status ' + meta.status;
+            var statusLabels = { 'complete': '\u2713', 'in-progress': '\u2014', 'not-started': '0', 'blocked': '\u2717', 'unavailable': '\u2014' };
+            statusSpan.textContent = statusLabels[meta.status] || meta.status;
+
+            var transformsSpan = document.createElement('span');
+            transformsSpan.className = 'showcase-transforms';
+            transformsSpan.textContent = '[' + meta.transforms + ']';
+
+            var defaultBtn = document.createElement('button');
+            defaultBtn.className = 'showcase-default-btn' + (repo.name === currentDefault ? ' is-default' : '');
+            defaultBtn.textContent = repo.name === currentDefault ? '\u25CF' : '\u25CB';
+            if (repo.name !== currentDefault) {
+                defaultBtn.addEventListener('click', (function(rn) {
+                    return function(e) { e.preventDefault(); switchDefault(rn); };
+                })(repo.name));
+            }
+
+            row.appendChild(missionLink);
+            row.appendChild(statusSpan);
+            row.appendChild(transformsSpan);
+            row.appendChild(defaultBtn);
+            bar.appendChild(row);
+        });
+
+        var showAllBtn = document.createElement('button');
+        showAllBtn.id = 'showcase-show-all';
+        showAllBtn.textContent = 'Show all';
+        showAllBtn.addEventListener('click', openGridOverlay);
+        bar.appendChild(showAllBtn);
+    }
+
+    // ─── W5 + W10: Unified switchDefault ────────────────────────────
+    function switchDefault(repoName) {
+        currentDefault = repoName;
+        localStorage.setItem('intention-showcase-default', repoName);
+
+        // Clear terminal and restart
+        var termOut = document.getElementById('terminal-output');
+        termOut.textContent = '';
+        intentionLines = [];
+        currentLineIndex = 0;
+        currentCharIndex = 0;
+        isTyping = false;
+        if (terminalTimeout) clearTimeout(terminalTimeout);
+        if (pollInterval) clearInterval(pollInterval);
+        pollIntentionUrl(repoName);
+        pollInterval = setInterval(function() { pollIntentionUrl(repoName); }, 300000);
+
+        // Switch screenshot
+        buildScreenshotShowcase(repoName);
+
+        // Switch Giscus
+        switchGiscus(repoName);
+
+        // Re-render showcase bar
+        renderShowcaseBar();
+
+        // Close grid if open
+        document.getElementById('grid-overlay').classList.remove('active');
+    }
+
+    // ─── W6: Parameterised VT100 polling ────────────────────────────
+    var intentionLines = [];
+    var terminalTimeout;
+    var currentLineIndex = 0;
+    var currentCharIndex = 0;
+    var isTyping = false;
+    var typingSpeed = 5;
+    var linePauseDuration = 100;
+    var pollInterval;
+
+    function typeCharacter() {
+        if (intentionLines.length === 0 || currentLineIndex >= intentionLines.length) {
+            currentLineIndex = 0;
+            document.getElementById('terminal-output').textContent = '';
+        }
+        var terminalOutput = document.getElementById('terminal-output');
+        var terminalContainer = document.getElementById('terminal-container');
+        var currentLine = intentionLines[currentLineIndex];
+        if (currentCharIndex < currentLine.length) {
+            terminalOutput.textContent += currentLine.charAt(currentCharIndex);
+            currentCharIndex++;
+            terminalContainer.scrollTop = terminalContainer.scrollHeight;
+            terminalTimeout = setTimeout(typeCharacter, typingSpeed);
+        } else {
+            isTyping = false;
+            terminalTimeout = setTimeout(startNextLine, linePauseDuration);
+        }
+    }
+
+    function startNextLine() {
+        if (isTyping) return;
+        isTyping = true;
+        currentCharIndex = 0;
+        currentLineIndex = (currentLineIndex + 1) % intentionLines.length;
+        if (currentLineIndex !== 0) {
+            var terminalOutput = document.getElementById('terminal-output');
+            var terminalContainer = document.getElementById('terminal-container');
+            terminalOutput.textContent += '\n';
+            terminalContainer.scrollTop = terminalContainer.scrollHeight;
+        }
+        typeCharacter();
+    }
+
+    function startTerminalDisplay() {
+        if (intentionLines.length === 0 || isTyping) return;
+        if (terminalTimeout) clearTimeout(terminalTimeout);
+        startNextLine();
+    }
+
+    function pollIntentionUrl(repoName) {
+        var contentsApiUrl = 'https://api.github.com/repos/' + OWNER + '/' + repoName + '/contents/?ref=agentic-lib-logs';
+        fetch(contentsApiUrl)
+            .then(function(response) {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(function(files) {
+                var logFiles = files
+                    .filter(function(f) { return f.name.indexOf('agent-log-') === 0 && f.name.endsWith('.md'); })
+                    .sort(function(a, b) { return a.name.localeCompare(b.name); });
+                var recentLogs = logFiles.slice(-5);
+                if (recentLogs.length === 0) {
+                    var fallbackUrl = 'https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/agentic-lib-logs/intenti%C3%B6n.md';
+                    return fetch(fallbackUrl).then(function(r) {
+                        if (!r.ok) return [];
+                        return r.text().then(function(t) { return [t]; });
+                    });
+                }
+                return Promise.all(recentLogs.map(function(f) {
+                    return fetch(f.download_url).then(function(r) { return r.text(); });
+                }));
+            })
+            .then(function(contents) {
+                if (!contents || contents.length === 0) return;
+                var combined = contents.join('\n\n');
+                var lines = combined.split('\n').filter(function(line) { return line.trim() !== ''; });
+                intentionLines = lines;
+                if (!isTyping) startTerminalDisplay();
+            })
+            .catch(function(error) {
+                console.error('Error fetching agent-log files:', error);
+            });
+    }
+
+    // ─── W6: Parameterised screenshot ───────────────────────────────
+    function buildScreenshotShowcase(repoName) {
+        var showcase = document.getElementById('screenshot-showcase');
+        var lightbox = document.getElementById('lightbox-overlay');
+        var lightboxImg = lightbox.querySelector('.lightbox-img');
+        var lightboxLink = lightbox.querySelector('.lightbox-link');
+        var lightboxPagesLink = lightbox.querySelector('.lightbox-pages-link');
+
+        showcase.innerHTML = '';
+        var imgUrl = 'https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/agentic-lib-logs/SCREENSHOT_INDEX.png';
+        var repoUrl = 'https://github.com/' + OWNER + '/' + repoName;
+        var pagesUrl = 'https://' + OWNER + '.github.io/' + repoName + '/';
+
+        var item = document.createElement('div');
+        item.className = 'screenshot-item';
+
+        var img = document.createElement('img');
+        img.className = 'screenshot-img';
+        img.src = imgUrl;
+        img.alt = repoName + ' screenshot';
+        img.loading = 'lazy';
+
+        var badge = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        badge.setAttribute('class', 'gh-badge');
+        badge.setAttribute('viewBox', '0 0 16 16');
+        badge.setAttribute('fill', '#333');
+        badge.innerHTML = '<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>';
+
+        item.appendChild(img);
+        item.appendChild(badge);
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+            lightboxImg.src = imgUrl;
+            lightboxImg.alt = repoName + ' screenshot';
+            lightboxLink.href = repoUrl;
+            lightboxPagesLink.href = pagesUrl;
+            lightbox.classList.add('active');
+        });
+        showcase.appendChild(item);
+
+        // Close lightbox handlers (idempotent — only bind once)
+        if (!lightbox._bound) {
+            lightbox.addEventListener('click', function(e) {
+                if (e.target === lightbox) lightbox.classList.remove('active');
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    lightbox.classList.remove('active');
+                    document.getElementById('mission-lightbox').classList.remove('active');
+                    document.getElementById('grid-overlay').classList.remove('active');
+                }
+            });
+            lightbox._bound = true;
+        }
+    }
+
+    // ─── W7: Mission lightbox (per-repo) ────────────────────────────
+    function openMissionLightbox(repoName) {
+        var missionLightbox = document.getElementById('mission-lightbox');
+        var missionContent = document.getElementById('mission-content');
+        var pagesLink = document.getElementById('mission-pages-link');
+        var repoLink = document.getElementById('mission-repo-link');
+
+        pagesLink.href = 'https://' + OWNER + '.github.io/' + repoName + '/';
+        repoLink.href = 'https://github.com/' + OWNER + '/' + repoName + '/blob/main/MISSION.md';
+
+        var meta = repoMeta[repoName];
+        if (meta && meta.missionText) {
+            missionContent.textContent = meta.missionText;
+        } else {
+            missionContent.textContent = 'Loading...';
+            fetchRepoMeta(repoName).then(function(m) {
+                missionContent.textContent = m.missionText || '(Could not load MISSION.md)';
+            });
+        }
+        missionLightbox.classList.add('active');
+    }
+
+    // Close mission lightbox on click outside
+    document.getElementById('mission-lightbox').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+
+    // ─── W8: Show-all grid overlay ──────────────────────────────────
+    function openGridOverlay() {
+        var overlay = document.getElementById('grid-overlay');
+        var grid = document.getElementById('grid-container');
+        grid.innerHTML = '';
+
+        SHOWCASE_REPOS.forEach(function(repo) {
+            var meta = repoMeta[repo.name] || { missionName: repo.label, status: 'unavailable', transforms: 0 };
+            var cell = document.createElement('div');
+            cell.className = 'grid-cell' + (repo.name === currentDefault ? ' is-default' : '');
+
+            var img = document.createElement('img');
+            img.className = 'grid-cell-img';
+            img.alt = repo.label + ' screenshot';
+            img.loading = 'lazy';
+            // Lazy-load: only fetch screenshot when grid opens
+            img.src = 'https://raw.githubusercontent.com/' + OWNER + '/' + repo.name + '/agentic-lib-logs/SCREENSHOT_INDEX.png';
+            img.onerror = function() {
+                this.style.background = '#222';
+                this.style.display = 'flex';
+                this.alt = 'No screenshot';
+            };
+
+            var info = document.createElement('div');
+            info.className = 'grid-cell-info';
+
+            var label = document.createElement('div');
+            label.className = 'grid-cell-label';
+            label.textContent = repo.label;
+
+            var gridStatusLabels = { 'complete': 'COMPLETE', 'in-progress': 'IN-PROGRESS', 'not-started': 'NOT STARTED', 'blocked': 'BLOCKED', 'unavailable': 'N/A' };
+            var statusSpan = document.createElement('span');
+            statusSpan.className = 'showcase-status ' + meta.status;
+            statusSpan.textContent = gridStatusLabels[meta.status] || meta.status;
+            statusSpan.style.marginLeft = '8px';
+
+            var mission = document.createElement('div');
+            mission.className = 'grid-cell-mission';
+            mission.textContent = meta.missionName;
+
+            label.appendChild(statusSpan);
+            info.appendChild(label);
+            info.appendChild(mission);
+            cell.appendChild(img);
+            cell.appendChild(info);
+
+            cell.addEventListener('click', (function(rn) {
+                return function() { switchDefault(rn); };
+            })(repo.name));
+
+            grid.appendChild(cell);
+        });
+
+        overlay.classList.add('active');
+    }
+
+    document.getElementById('grid-close').addEventListener('click', function() {
+        document.getElementById('grid-overlay').classList.remove('active');
+    });
+    document.getElementById('grid-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+
+    // ─── W9: Dynamic Giscus discussions ─────────────────────────────
+    function switchGiscus(repoName) {
+        var config = SHOWCASE_REPOS.find(function(r) { return r.name === repoName; });
+        if (!config) return;
+
+        var container = document.getElementById('giscus-container');
+
+        // If giscus isn't installed on this repo, show a link to discussions instead
+        if (!config.giscus) {
+            container.innerHTML = '';
+            var link = document.createElement('a');
+            link.href = 'https://github.com/' + OWNER + '/' + repoName + '/discussions';
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.textContent = 'View discussions for ' + config.label + ' on GitHub';
+            link.style.cssText = 'color: #3F5965; font-size: 14px; text-decoration: underline; display: block; text-align: center; padding: 16px;';
+            container.appendChild(link);
+            return;
+        }
+
+        var meta = repoMeta[repoName] || {};
+        var term = meta.discussionTerm || 'Talk to the repository';
+
+        var iframe = document.querySelector('iframe.giscus-frame');
+        if (iframe) {
+            iframe.contentWindow.postMessage({
+                giscus: {
+                    setConfig: {
+                        repo: OWNER + '/' + repoName,
+                        repoId: config.repoId,
+                        category: 'General',
+                        categoryId: config.categoryId,
+                        term: term,
+                    }
+                }
+            }, 'https://giscus.app');
+        } else {
+            loadGiscusScript(repoName, config, term);
+        }
+    }
+
+    function loadGiscusScript(repoName, config, term) {
+        var container = document.getElementById('giscus-container');
+        container.innerHTML = '';
+        var script = document.createElement('script');
+        script.src = 'https://giscus.app/client.js';
+        script.setAttribute('data-repo', OWNER + '/' + repoName);
+        script.setAttribute('data-repo-id', config.repoId);
+        script.setAttribute('data-category', 'General');
+        script.setAttribute('data-category-id', config.categoryId);
+        script.setAttribute('data-mapping', 'specific');
+        script.setAttribute('data-term', term);
+        script.setAttribute('data-strict', '0');
+        script.setAttribute('data-reactions-enabled', '0');
+        script.setAttribute('data-emit-metadata', '0');
+        script.setAttribute('data-input-position', 'top');
+        script.setAttribute('data-theme', 'noborder_light');
+        script.setAttribute('data-lang', 'en');
+        script.crossOrigin = 'anonymous';
+        script.async = true;
+        container.appendChild(script);
+    }
+
+    // ─── Logo menu (unchanged) ──────────────────────────────────────
+    var isMenuVisible = false;
+    var menuTimeout;
+    var currentImageIndex = 0;
+    var imageInterval;
+
+    function cycleMenuImages() {
+        var images = [document.getElementById('menu-img-1'), document.getElementById('menu-img-2')];
+        images.forEach(function(img) { img.style.opacity = '0'; });
+        currentImageIndex = (currentImageIndex + 1) % images.length;
+        images[currentImageIndex].style.opacity = '1';
+        if (imageInterval) clearTimeout(imageInterval);
+        var nextDelay = currentImageIndex === 0 ? 1500 : 50;
+        imageInterval = setTimeout(cycleMenuImages, nextDelay);
+    }
+
+    function showMenu() {
+        var menu = document.getElementById('menu');
+        menu.style.opacity = '1';
+        isMenuVisible = true;
+        if (menuTimeout) clearTimeout(menuTimeout);
+        if (imageInterval) clearTimeout(imageInterval);
+        cycleMenuImages();
+        menuTimeout = setTimeout(function() {
+            menu.style.opacity = '0';
+            isMenuVisible = false;
+            if (imageInterval) clearTimeout(imageInterval);
+        }, 10000);
+    }
+
+    document.body.addEventListener('mousemove', showMenu);
+    window.addEventListener('load', function() {
+        document.getElementById('menu-img-1').style.opacity = '1';
+        currentImageIndex = 0;
+        if (isMenuVisible) cycleMenuImages();
+    });
+    setTimeout(showMenu, 5000);
+
+    // ─── Initialise ─────────────────────────────────────────────────
+    loadRepoConfig().then(function() {
+        return fetchAllMeta();
+    }).then(function() {
+        renderShowcaseBar();
+        pollIntentionUrl(currentDefault);
+        pollInterval = setInterval(function() { pollIntentionUrl(currentDefault); }, 300000);
+        buildScreenshotShowcase(currentDefault);
+        var defaultConfig = SHOWCASE_REPOS.find(function(r) { return r.name === currentDefault; });
+        var defaultMeta = repoMeta[currentDefault] || {};
+        if (defaultConfig) {
+            loadGiscusScript(currentDefault, defaultConfig, defaultMeta.discussionTerm || 'Talk to the repository');
+        }
+    });
+</script>
+
+</body>
+</html>
