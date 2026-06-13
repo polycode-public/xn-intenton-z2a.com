@@ -76,15 +76,15 @@ public class WebStack extends Stack {
         // Certificate (looked up by ARN — must be in us-east-1)
         ICertificate certificate = Certificate.fromCertificateArn(this, "Certificate", certificateArn);
 
-        // Response headers policy with CSP for giscus
+        // Response headers policy with CSP for the marginalia chat embed
         ResponseHeadersPolicy headersPolicy = ResponseHeadersPolicy.Builder.create(this, "SecurityHeaders")
                 .securityHeadersBehavior(ResponseSecurityHeadersBehavior.builder()
                         .contentSecurityPolicy(ResponseHeadersContentSecurityPolicy.builder()
                                 .contentSecurityPolicy(
                                         "default-src 'self'; " +
-                                        "script-src 'self' 'unsafe-inline' https://giscus.app; " +
-                                        "style-src 'self' 'unsafe-inline' https://giscus.app; " +
-                                        "frame-src https://giscus.app; " +
+                                        "script-src 'self' 'unsafe-inline'; " +
+                                        "style-src 'self' 'unsafe-inline'; " +
+                                        "frame-src https://marginalia.polycode.co.uk; " +
                                         "img-src 'self' data: https://avatars.githubusercontent.com https://raw.githubusercontent.com; " +
                                         "connect-src 'self' https://api.github.com https://raw.githubusercontent.com; " +
                                         "frame-ancestors 'none'; " +

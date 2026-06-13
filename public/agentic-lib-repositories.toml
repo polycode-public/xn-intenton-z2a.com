@@ -1,11 +1,10 @@
 # agentic-lib-repositories.toml — Showcase repository configuration
-# Used by index.html to populate the multi-repo showcase bar, grid, and discussions.
+# Used by index.html to populate the multi-repo showcase bar + the marginalia
+# chat embed. The embed needs only `name` (the repo slug) and `label`; the chat is
+# seeded from each repo's CI-exported summary at
+#   https://raw.githubusercontent.com/<owner>/<slug>/agentic-lib-logs/summary.json
 #
-# To add a new repository:
-#   1. Add a new entry below (copy an existing block)
-#   2. Get the repo-id from: gh api repos/polycode-public/<name> --jq '.node_id'
-#   3. Get the category-id from: gh api graphql -f query='{ repository(owner:"polycode-public", name:"<name>") { discussionCategories(first:5) { nodes { id name } } } }' --jq '.data.repository.discussionCategories.nodes[] | select(.name == "General") | .id'
-#   4. Install giscus on the repo at https://github.com/apps/giscus
+# To add a repository: add a [[repositories]] block with its slug + a short label.
 
 [owner]
 name = "polycode-public"
@@ -13,34 +12,23 @@ name = "polycode-public"
 [[repositories]]
 name = "repository0"
 label = "repository0"
-repo-id = "R_kgDON6E8ZA"
-category-id = "DIC_kwDON6E8ZM4CpwzM"
-giscus = true
 
 [[repositories]]
-name = "repository0-string-utils"
-label = "string-utils"
-repo-id = "R_kgDORsndTg"
-category-id = "DIC_kwDORsndTs4C45WB"
-giscus = true
+name = "8-kyu-remember-hello-world"
+label = "hello-world"
 
 [[repositories]]
-name = "repository0-dense-encoder"
-label = "dense-encoding"
-repo-id = "R_kgDORsnZxA"
-category-id = "DIC_kwDORsnZxM4C45Vj"
-giscus = true
+name = "6-kyu-understand-roman-numerals"
+label = "roman-numerals"
 
 [[repositories]]
-name = "repository0-random"
-label = "random"
-repo-id = "R_kgDORsnWVw"
-category-id = "DIC_kwDORsnWV84C45VR"
-giscus = true
+name = "4-kyu-apply-cron-engine"
+label = "cron-engine"
 
 [[repositories]]
-name = "repository0-plot-code-lib"
-label = "plot-code-lib"
-repo-id = "R_kgDORrzlsg"
-category-id = "DIC_kwDORrzlss4C40yA"
-giscus = true
+name = "3-kyu-analyze-lunar-lander"
+label = "lunar-lander"
+
+[[repositories]]
+name = "2-kyu-create-markdown-compiler"
+label = "markdown-compiler"
