@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <cdk.version>2.243.0</cdk.version>
-        <constructs.version>10.5.1</constructs.version>
+        <constructs.version>10.6.0</constructs.version>
         <junit.version>5.12.2</junit.version>
     </properties>
 
