@@ -11,7 +11,7 @@
     "build": "echo \"Nothing to build\""
   },
   "keywords": [],
-  "author": "https://github.com/xn-intenton-z2a",
+  "author": "https://github.com/polycode-public",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
   },
@@ -45,7 +45,7 @@
   },
 
   "bugs": {
-    "url": "https://github.com/xn-intenton-z2a/repository0/discussions/1862"
+    "url": "https://github.com/polycode-public/repository0/discussions/1862"
   },
   "homepage": "https://xn--intenton-z2a.com/"
 }

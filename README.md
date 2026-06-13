@@ -8,7 +8,7 @@ The public website for intentïon at [xn--intenton-z2a.com](https://xn--intenton
 
 A minimalist single-page website presenting the intentïon brand. Dark text on an animated fog background, with community interaction via [Giscus](https://giscus.app/) (GitHub Discussions).
 
-The site showcases autonomous code evolution experiments running on [repository0](https://github.com/xn-intenton-z2a/repository0), powered by [agentic-lib](https://github.com/xn-intenton-z2a/agentic-lib).
+The site showcases autonomous code evolution experiments running on [repository0](https://github.com/polycode-public/repository0), powered by [agentic-lib](https://github.com/polycode-public/agentic-lib).
 
 ## Pronunciation
 

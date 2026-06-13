@@ -2,7 +2,7 @@
 
 **Created**: 2026-03-21
 **Status**: PENDING
-**Issue**: https://github.com/xn-intenton-z2a/agentic-lib/issues/1924
+**Issue**: https://github.com/polycode-public/agentic-lib/issues/1924
 **Branch**: `claude/showcase`
 
 ---
@@ -18,15 +18,15 @@ Replace the top-right "MISSION.md" link with a multi-repository showcase selecto
 ### Top-Right Mission Link
 - Element: `<a id="mission-link">MISSION.md</a>` at `top: 8px; right: 8px` (fixed, z-index 2500)
 - Clicking opens a lightbox showing MISSION.md content fetched from `repository0/main`
-- Currently hardcoded to `xn-intenton-z2a/repository0`
+- Currently hardcoded to `polycode-public/repository0`
 
 ### VT100 Terminal
-- Polls `https://api.github.com/repos/xn-intenton-z2a/repository0/contents/?ref=agentic-lib-logs`
+- Polls `https://api.github.com/repos/polycode-public/repository0/contents/?ref=agentic-lib-logs`
 - Fetches last 5 `agent-log-*.md` files, concatenates, types them character-by-character
 - Hardcoded to `repository0`
 
 ### Screenshot
-- Loads `https://raw.githubusercontent.com/xn-intenton-z2a/repository0/agentic-lib-logs/SCREENSHOT_INDEX.png`
+- Loads `https://raw.githubusercontent.com/polycode-public/repository0/agentic-lib-logs/SCREENSHOT_INDEX.png`
 - Lightbox links to `repository0` GitHub Pages and repository
 - Hardcoded to `repository0`
 
@@ -43,11 +43,11 @@ Replace the top-right "MISSION.md" link with a multi-repository showcase selecto
 
 | Repository | GitHub URL |
 |------------|-----------|
-| `repository0` | `xn-intenton-z2a/repository0` |
-| `repository0-string-utils` | `xn-intenton-z2a/repository0-string-utils` |
-| `repository0-random` | `xn-intenton-z2a/repository0-random` |
-| `repository0-crucible` | `xn-intenton-z2a/repository0-crucible` |
-| `repository0-plot-code-lib` | `xn-intenton-z2a/repository0-plot-code-lib` |
+| `repository0` | `polycode-public/repository0` |
+| `repository0-string-utils` | `polycode-public/repository0-string-utils` |
+| `repository0-random` | `polycode-public/repository0-random` |
+| `repository0-crucible` | `polycode-public/repository0-crucible` |
+| `repository0-plot-code-lib` | `polycode-public/repository0-plot-code-lib` |
 
 ---
 
@@ -229,7 +229,7 @@ Cache all results in a `repoMetadata` Map to avoid re-fetching on "make default"
 └─────────────────────────────────────────────┘
 ```
 
-**6th cell**: "Create your own" card linking to `https://github.com/xn-intenton-z2a/repository0` with "Use this template" CTA. On-brand for the project's purpose as a template.
+**6th cell**: "Create your own" card linking to `https://github.com/polycode-public/repository0` with "Use this template" CTA. On-brand for the project's purpose as a template.
 
 Each repo cell shows:
 - Screenshot image (**lazy-loaded** — only fetched when overlay opens, not on page load)
@@ -258,7 +258,7 @@ Each repo cell shows:
 
 **Discussion term**: Use the REST Discussions endpoint (not GraphQL — GraphQL requires authentication, REST works unauthenticated for public repos):
 ```
-GET https://api.github.com/repos/xn-intenton-z2a/{repo}/discussions?per_page=1&direction=desc
+GET https://api.github.com/repos/polycode-public/{repo}/discussions?per_page=1&direction=desc
 ```
 Extract the discussion title from the first result. Cache it per repo. Fallback to `"Talk to the repository"` if the API call fails or returns empty.
 
@@ -275,7 +275,7 @@ function switchGiscus(repoName) {
     iframe.contentWindow.postMessage({
       giscus: {
         setConfig: {
-          repo: 'xn-intenton-z2a/' + repoName,
+          repo: 'polycode-public/' + repoName,
           repoId: config.repoId,
           category: 'General',
           categoryId: config.categoryId,
@@ -289,7 +289,7 @@ function switchGiscus(repoName) {
     container.innerHTML = '';
     const script = document.createElement('script');
     script.src = 'https://giscus.app/client.js';
-    script.setAttribute('data-repo', 'xn-intenton-z2a/' + repoName);
+    script.setAttribute('data-repo', 'polycode-public/' + repoName);
     script.setAttribute('data-repo-id', config.repoId);
     script.setAttribute('data-category', 'General');
     script.setAttribute('data-category-id', config.categoryId);

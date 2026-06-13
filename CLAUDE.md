@@ -27,7 +27,7 @@
 
 The **home page infrastructure** for intentïon at [xn--intenton-z2a.com](https://xn--intenton-z2a.com/). Single CDK stack deploying the intentïon brand website.
 
-- **Organisation**: `xn-intenton-z2a`
+- **Organisation**: `polycode-public`
 - **Infrastructure**: Single AWS CDK stack (CloudFront + OAC, S3, Route53, CloudWatch Logs)
 - **Sensitive file**: `intentïon brand accounts.kdbx` — KeePass database (never commit plaintext secrets)
 

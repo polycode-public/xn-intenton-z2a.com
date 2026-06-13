@@ -3,12 +3,12 @@
 #
 # To add a new repository:
 #   1. Add a new entry below (copy an existing block)
-#   2. Get the repo-id from: gh api repos/xn-intenton-z2a/<name> --jq '.node_id'
-#   3. Get the category-id from: gh api graphql -f query='{ repository(owner:"xn-intenton-z2a", name:"<name>") { discussionCategories(first:5) { nodes { id name } } } }' --jq '.data.repository.discussionCategories.nodes[] | select(.name == "General") | .id'
+#   2. Get the repo-id from: gh api repos/polycode-public/<name> --jq '.node_id'
+#   3. Get the category-id from: gh api graphql -f query='{ repository(owner:"polycode-public", name:"<name>") { discussionCategories(first:5) { nodes { id name } } } }' --jq '.data.repository.discussionCategories.nodes[] | select(.name == "General") | .id'
 #   4. Install giscus on the repo at https://github.com/apps/giscus
 
 [owner]
-name = "xn-intenton-z2a"
+name = "polycode-public"
 
 [[repositories]]
 name = "repository0"
