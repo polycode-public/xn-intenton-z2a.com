@@ -2,7 +2,7 @@
 # scripts/assume-deployment-role.sh
 # Usage: source scripts/assume-deployment-role.sh
 
-DEFAULTED_DEPLOY_ROLE_ARN=${DEPLOY_ROLE_ARN-arn:aws:iam::541134664601:role/intention-com-web-deployment-role}
+DEFAULTED_DEPLOY_ROLE_ARN=${DEPLOY_ROLE_ARN-arn:aws:iam::813333281588:role/intention-com-web-deployment-role}
 
 # Reset, assume and export into shell
 unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN

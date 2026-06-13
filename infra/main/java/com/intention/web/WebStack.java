@@ -170,7 +170,7 @@ public class WebStack extends Stack {
         delivery.addDependency(deliverySource);
 
         // Route53 records
-        String hostedZoneId = "Z09934692CHZL2KPE9Q9F";
+        String hostedZoneId = "Z0816178Q6ZU5SY8ZWGZ";
         String zoneName = "xn--intenton-z2a.com";
 
         IHostedZone hostedZone = HostedZone.fromHostedZoneAttributes(this, "HostedZone",

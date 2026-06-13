@@ -114,7 +114,7 @@ jobs:
         if: needs.params.outputs.skip-deploy != 'true'
         run: |
           STACK_NAME="${{ env.ENVIRONMENT_NAME }}-web-stack"
-          HOSTED_ZONE_ID="Z09934692CHZL2KPE9Q9F"
+          HOSTED_ZONE_ID="Z0816178Q6ZU5SY8ZWGZ"
           CLOUDFRONT_HOSTED_ZONE_ID="Z2FDTNDATAQYW2"
 
           # Determine expected domain name

@@ -31,8 +31,8 @@ jobs:
       id-token: write
 
     env:
-      iamActionsRoleArn: ${{ inputs.iamActionsRoleArn || 'arn:aws:iam::541134664601:role/agentic-lib-github-actions-role' }}
-      iamDeploymentRoleArn: ${{ inputs.iamDeploymentRoleArn || 'arn:aws:iam::541134664601:role/intention-com-web-deployment-role' }}
+      iamActionsRoleArn: ${{ inputs.iamActionsRoleArn || 'arn:aws:iam::813333281588:role/agentic-lib-github-actions-role' }}
+      iamDeploymentRoleArn: ${{ inputs.iamDeploymentRoleArn || 'arn:aws:iam::813333281588:role/intention-com-web-deployment-role' }}
 
     steps:
 
