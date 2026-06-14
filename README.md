@@ -16,7 +16,7 @@ intentïon. /ɪnˈtɛnʃən/. The diaeresis is a style thing. Pronounce your int
 
 ## Chat
 
-Chat is the **marginalia embed**, not Giscus. `public/index.html` iframes
+Chat is the **marginalia embed**. `public/index.html` iframes
 `https://marginalia.polycode.co.uk/embed.html?seed=<raw summary.json URL>&repo=<owner/slug>`,
 and the Content-Security-Policy restricts `frame-src` to `https://marginalia.polycode.co.uk`.
 
