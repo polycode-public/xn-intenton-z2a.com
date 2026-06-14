@@ -10,6 +10,8 @@ A minimalist single-page website presenting the intentïon brand. Dark text on a
 
 The site showcases autonomous code evolution experiments running on the fleet of INTENT repositories, powered by [agentic-lib](https://github.com/polycode-public/agentic-lib). The repo-bar (driven by `public/agentic-lib-repositories.toml`) lets visitors switch between the fleet INTENTs; for each one the page fetches its `INTENT.md` and `agentic-lib-logs/summary.json` from GitHub.
 
+The site is a **read-only view** of the fleet — it renders each repo's exported `summary.json` and drives nothing itself. The repos behind it cannot self-drive either; delivery is driven by one of **three hands**: a human (raising issues, dispatching workflows, reviewing and merging PRs by hand), Claude + the benchmark harness (the `intention` Claude Code session orchestrating a run), or marginalia (the supervisor graph, one piece at a time via its `repo_dispatch` actuator).
+
 ## Pronunciation
 
 intentïon. /ɪnˈtɛnʃən/. The diaeresis is a style thing. Pronounce your intentïon as you please.
