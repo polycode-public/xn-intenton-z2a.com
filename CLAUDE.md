@@ -25,10 +25,11 @@
 
 ## What This Repository Is
 
-The **home page infrastructure** for intentïon at [xn--intenton-z2a.com](https://xn--intenton-z2a.com/). Single CDK stack deploying the intentïon brand website.
+The **home page infrastructure** for intentïon at [xn--intenton-z2a.com](https://xn--intenton-z2a.com/). Single CDK stack deploying the intentïon brand website. The site is **live** at the kept apex `xn--intenton-z2a.com`.
 
-- **Organisation**: `polycode-public`
+- **Organisation**: `polycode-public` (CI = GitHub Actions; AWS auth = GitHub-OIDC)
 - **Infrastructure**: Single AWS CDK stack (CloudFront + OAC, S3, Route53, CloudWatch Logs)
+- **Chat**: the **marginalia chat embed** — `public/index.html` iframes `https://marginalia.polycode.co.uk/embed.html?seed=<raw summary.json URL>&repo=<owner/slug>`, with the CSP `frame-src` set to `https://marginalia.polycode.co.uk`. The embed runs tier-0 chat on marginalia's shared default graph, seeded client-side from each repo's `agentic-lib-logs/summary.json` on raw.githubusercontent.com (the private graph is never read by the browser). The showcase repo-bar (driven by `public/agentic-lib-repositories.toml`) lists the 5 fleet INTENTs.
 - **Sensitive file**: `intentïon brand accounts.kdbx` — KeePass database (never commit plaintext secrets)
 
 ## Key Architecture
@@ -46,7 +47,16 @@ Single flat Maven project producing one shaded JAR (`target/web.jar`):
 
 **Environments:** `ci` (branches → `ci.web.xn--intenton-z2a.com`) and `prod` (main → `xn--intenton-z2a.com`)
 
-**GitHub variables:** `ACTIONS_ROLE_ARN`, `DEPLOY_ROLE_ARN` (repo-level), `CERTIFICATE_ARN` (per environment)
+**GitHub variables:** `ACTIONS_ROLE_ARN`, `DEPLOY_ROLE_ARN`, `CERTIFICATE_ARN` — per-environment GitHub **environment variables** drive the deploy (prod set is wired; ci not yet wired). Deploy path: `./mvnw clean verify` → `npx cdk deploy {env}-web-stack` via `.github/workflows/deploy.yml` on push (main → prod).
+
+## AWS Account Layout
+
+- **Account**: deployed to the **intention-prod** account **813333281588** (Workloads OU, under management account 541134664601).
+- **Region**: **eu-west-2** for workloads; **us-east-1** for the CloudFront ACM cert.
+- **DNS**: Route53 hosted zone **`Z0816178Q6ZU5SY8ZWGZ`** in intention-prod (registrar NS repointed here; the old management-account zone is retired).
+- **Certificate**: ACM cert covering apex + `*.web.xn--intenton-z2a.com` in **intention-prod / us-east-1** (its ARN is the `CERTIFICATE_ARN` env var).
+- **Deploy roles** (in intention-prod): GitHub-OIDC actions role **`agentic-lib-github-actions-role`** → least-privilege deploy role **`intention-com-web-deployment-role`** (it can assume the CDK bootstrap roles plus DNS-repair perms; it is NOT AdministratorAccess).
+- **SSO**: profiles `intention-ci` / `intention-prod` in `~/.aws/config` (`sso_session=polycode`, AdministratorAccess); or assume `OrganizationAccountAccessRole` from `polycode-management`.
 
 ## Test Commands
 
