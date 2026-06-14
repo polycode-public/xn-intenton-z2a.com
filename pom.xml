@@ -20,10 +20,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
-        <cdk.version>2.243.0</cdk.version>
-        <constructs.version>10.5.1</constructs.version>
-        <junit.version>5.12.2</junit.version>
+        <maven.compiler.release>25</maven.compiler.release>
+        <cdk.version>2.259.0</cdk.version>
+        <constructs.version>10.6.0</constructs.version>
+        <junit.version>5.14.4</junit.version>
+        <junit-platform.version>1.14.4</junit-platform.version>
     </properties>
 
     <dependencies>
@@ -44,6 +45,14 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Explicit launcher: JUnit 5.14 + Surefire 3.5.5 require it on the test
+             classpath for test discovery (platform 1.x tracks jupiter 5.x). -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit-platform.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
