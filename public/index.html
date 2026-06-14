@@ -485,7 +485,7 @@
 
 <!-- Mission lightbox -->
 <div id="mission-lightbox">
-    <div class="mission-content" id="mission-content">Loading MISSION.md...</div>
+    <div class="mission-content" id="mission-content">Loading INTENT.md...</div>
     <div class="mission-links" id="mission-links">
         <a class="mission-pages-link" id="mission-pages-link" href="#" target="_blank" rel="noopener">
             <span>Visit website</span>
@@ -493,7 +493,7 @@
         </a>
         <a class="mission-link-item" id="mission-repo-link" href="#" target="_blank" rel="noopener">
             <svg viewBox="0 0 16 16" width="20" height="20" fill="white"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            <span>View MISSION.md</span>
+            <span>View INTENT.md</span>
         </a>
     </div>
 </div>
@@ -618,12 +618,12 @@
                 var names = Array.isArray(files) ? files.map(function(f) { return f.name; }) : [];
                 if (names.indexOf('MISSION_COMPLETE.md') >= 0) meta.status = 'complete';
                 else if (names.indexOf('MISSION_FAILED.md') >= 0) meta.status = 'blocked';
-                else if (names.indexOf('MISSION.md') >= 0) meta.status = 'in-progress';
+                else if (names.indexOf('INTENT.md') >= 0) meta.status = 'in-progress';
                 else meta.status = 'not-started';
             })
             .catch(function() { meta.status = 'unavailable'; });
 
-        var missionP = fetch('https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/main/MISSION.md')
+        var missionP = fetch('https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/main/INTENT.md')
             .then(function(r) { return r.ok ? r.text() : null; })
             .then(function(text) {
                 if (text) meta.missionText = text;
@@ -635,11 +635,11 @@
             .then(function(r) { return r.ok ? r.text() : ''; })
             .then(function(text) {
                 // Extract [init].mission — the seed name like "7-kyu-understand-fizz-buzz"
-                // Must match under [init] section, not [paths] which has mission = "MISSION.md"
+                // Must match under [init] section, not [paths] which has mission = "INTENT.md"
                 var initSection = text.match(/\[init\]([\s\S]*?)(?=\n\[|$)/);
                 if (initSection) {
                     var missionMatch = initSection[1].match(/^\s*mission\s*=\s*"([^"]*)"/m);
-                    if (missionMatch && missionMatch[1] !== 'MISSION.md') meta.missionName = missionMatch[1];
+                    if (missionMatch && missionMatch[1] !== 'INTENT.md') meta.missionName = missionMatch[1];
                 }
             })
             .catch(function() {});
@@ -680,7 +680,7 @@
             var missionLink = document.createElement('a');
             missionLink.className = 'showcase-mission';
             missionLink.textContent = meta.missionName;
-            missionLink.title = 'View MISSION.md for ' + repo.label;
+            missionLink.title = 'View INTENT.md for ' + repo.label;
             missionLink.href = '#';
             missionLink.addEventListener('click', (function(rn) {
                 return function(e) { e.preventDefault(); openMissionLightbox(rn); };
@@ -896,7 +896,7 @@
         var repoLink = document.getElementById('mission-repo-link');
 
         pagesLink.href = 'https://' + OWNER + '.github.io/' + repoName + '/';
-        repoLink.href = 'https://github.com/' + OWNER + '/' + repoName + '/blob/main/MISSION.md';
+        repoLink.href = 'https://github.com/' + OWNER + '/' + repoName + '/blob/main/INTENT.md';
 
         var meta = repoMeta[repoName];
         if (meta && meta.missionText) {
@@ -904,7 +904,7 @@
         } else {
             missionContent.textContent = 'Loading...';
             fetchRepoMeta(repoName).then(function(m) {
-                missionContent.textContent = m.missionText || '(Could not load MISSION.md)';
+                missionContent.textContent = m.missionText || '(Could not load INTENT.md)';
             });
         }
         missionLightbox.classList.add('active');
