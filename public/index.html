@@ -610,18 +610,21 @@
     function fetchRepoMeta(repoName) {
         if (repoMeta[repoName]) return Promise.resolve(repoMeta[repoName]);
 
-        var meta = { missionName: repoName, missionText: null, status: 'unavailable', transforms: 0, discussionTerm: 'Talk to the repository' };
+        var meta = { missionName: repoName, missionText: null, status: 'unavailable', transforms: 0, discussionTerm: 'Talk to the repository', summaryText: '', themes: [], topNodes: [], generatedAt: null, provCount: 0 };
 
+        // Track INTENT.md presence and whether the listing succeeded; the final
+        // status is computed in the Promise.all below, combining this with the
+        // repo's graph memory (summary.top_nodes).
+        var hasIntent = false;
+        var listingOk = false;
         var listingP = fetch('https://api.github.com/repos/' + OWNER + '/' + repoName + '/contents/?ref=main')
             .then(function(r) { return r.ok ? r.json() : []; })
             .then(function(files) {
                 var names = Array.isArray(files) ? files.map(function(f) { return f.name; }) : [];
-                if (names.indexOf('MISSION_COMPLETE.md') >= 0) meta.status = 'complete';
-                else if (names.indexOf('MISSION_FAILED.md') >= 0) meta.status = 'blocked';
-                else if (names.indexOf('INTENT.md') >= 0) meta.status = 'in-progress';
-                else meta.status = 'not-started';
+                listingOk = true;
+                hasIntent = names.indexOf('INTENT.md') >= 0;
             })
-            .catch(function() { meta.status = 'unavailable'; });
+            .catch(function() { listingOk = false; });
 
         var missionP = fetch('https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/main/INTENT.md')
             .then(function(r) { return r.ok ? r.text() : null; })
@@ -644,11 +647,19 @@
             })
             .catch(function() {});
 
-        var stateP = fetch('https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/agentic-lib-logs/agentic-lib-state.toml')
-            .then(function(r) { return r.ok ? r.text() : ''; })
-            .then(function(text) {
-                var m = text.match(/cumulative-transforms\s*=\s*(\d+)/);
-                if (m) meta.transforms = parseInt(m[1], 10);
+        // Fetch the marginalia graph summary (the only artifact the 8.0.0 engine
+        // writes to agentic-lib-logs). Transform count is now the number of
+        // memory nodes in the repo's graph. Tolerate 404 → empty.
+        var summaryP = fetch(summaryUrlFor(repoName))
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(summary) {
+                if (!summary) return;
+                meta.topNodes = summary.top_nodes || [];
+                meta.transforms = meta.topNodes.length;
+                meta.summaryText = summary.summary || '';
+                meta.themes = summary.themes || [];
+                meta.generatedAt = summary.generated_at || null;
+                meta.provCount = (summary.provenance || []).length;
             })
             .catch(function() {});
 
@@ -657,7 +668,13 @@
         // and the repo has many discussions with this title, so we use the default.
         var discussionP = Promise.resolve();
 
-        return Promise.all([listingP, missionP, tomlP, stateP, discussionP]).then(function() {
+        return Promise.all([listingP, missionP, tomlP, summaryP, discussionP]).then(function() {
+            // Graph memory present → complete; else INTENT delivered → in-progress;
+            // else listing succeeded → not-started; else unavailable.
+            if (meta.topNodes.length > 0) meta.status = 'complete';
+            else if (hasIntent) meta.status = 'in-progress';
+            else if (listingOk) meta.status = 'not-started';
+            else meta.status = 'unavailable';
             repoMeta[repoName] = meta;
             return meta;
         });
@@ -797,38 +814,47 @@
         startNextLine();
     }
 
+    // Drive the VT100 from the repo's marginalia graph summary (the prose
+    // narrative of what the repo's graph remembers). The old agent-log-*.md
+    // artifacts are no longer written by the 8.0.0 engine.
+    function renderTerminalFromSummary(repoName, meta) {
+        var slug = repoName;
+        var narrative = (meta && meta.summaryText) || '';
+        var lines;
+        if (narrative) {
+            lines = narrative.split('\n').filter(function(line) { return line.trim() !== ''; });
+            // Optionally append a themes / top-node line for texture.
+            if (meta.themes && meta.themes.length) {
+                lines.push('themes: ' + meta.themes.join(', '));
+            } else if (meta.topNodes && meta.topNodes.length) {
+                lines.push('remembers: ' + meta.topNodes[0].content);
+            }
+        } else {
+            lines = [slug + ': no graph memory yet — deliver an INTENT to begin.'];
+        }
+        intentionLines = lines;
+        if (!isTyping) startTerminalDisplay();
+    }
+
     function pollIntentionUrl(repoName) {
-        var contentsApiUrl = 'https://api.github.com/repos/' + OWNER + '/' + repoName + '/contents/?ref=agentic-lib-logs';
-        fetch(contentsApiUrl)
-            .then(function(response) {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
+        var meta = repoMeta[repoName];
+        if (meta && typeof meta.summaryText === 'string') {
+            renderTerminalFromSummary(repoName, meta);
+            return;
+        }
+        // No cached meta yet — fetch the summary directly.
+        fetch(summaryUrlFor(repoName))
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(summary) {
+                var m = summary ? {
+                    summaryText: summary.summary || '',
+                    themes: summary.themes || [],
+                    topNodes: summary.top_nodes || []
+                } : { summaryText: '', themes: [], topNodes: [] };
+                renderTerminalFromSummary(repoName, m);
             })
-            .then(function(files) {
-                var logFiles = files
-                    .filter(function(f) { return f.name.indexOf('agent-log-') === 0 && f.name.endsWith('.md'); })
-                    .sort(function(a, b) { return a.name.localeCompare(b.name); });
-                var recentLogs = logFiles.slice(-5);
-                if (recentLogs.length === 0) {
-                    var fallbackUrl = 'https://raw.githubusercontent.com/' + OWNER + '/' + repoName + '/agentic-lib-logs/intenti%C3%B6n.md';
-                    return fetch(fallbackUrl).then(function(r) {
-                        if (!r.ok) return [];
-                        return r.text().then(function(t) { return [t]; });
-                    });
-                }
-                return Promise.all(recentLogs.map(function(f) {
-                    return fetch(f.download_url).then(function(r) { return r.text(); });
-                }));
-            })
-            .then(function(contents) {
-                if (!contents || contents.length === 0) return;
-                var combined = contents.join('\n\n');
-                var lines = combined.split('\n').filter(function(line) { return line.trim() !== ''; });
-                intentionLines = lines;
-                if (!isTyping) startTerminalDisplay();
-            })
-            .catch(function(error) {
-                console.error('Error fetching agent-log files:', error);
+            .catch(function() {
+                renderTerminalFromSummary(repoName, { summaryText: '', themes: [], topNodes: [] });
             });
     }
 
@@ -851,8 +877,11 @@
         var img = document.createElement('img');
         img.className = 'screenshot-img';
         img.src = imgUrl;
-        img.alt = repoName + ' screenshot';
+        img.alt = '';
         img.loading = 'lazy';
+        // The 8.0.0 engine no longer writes SCREENSHOT_INDEX.png. If the image
+        // 404s, hide the whole item so no broken-image artifact renders.
+        img.onerror = function() { item.style.display = 'none'; };
 
         var badge = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         badge.setAttribute('class', 'gh-badge');
@@ -928,14 +957,15 @@
 
             var img = document.createElement('img');
             img.className = 'grid-cell-img';
-            img.alt = repo.label + ' screenshot';
+            img.alt = '';
             img.loading = 'lazy';
-            // Lazy-load: only fetch screenshot when grid opens
+            // Lazy-load: only fetch screenshot when grid opens. The 8.0.0 engine
+            // no longer writes SCREENSHOT_INDEX.png, so on 404 collapse the image
+            // to a plain placeholder block — no broken image / alt text.
             img.src = 'https://raw.githubusercontent.com/' + OWNER + '/' + repo.name + '/agentic-lib-logs/SCREENSHOT_INDEX.png';
             img.onerror = function() {
+                this.removeAttribute('src');
                 this.style.background = '#222';
-                this.style.display = 'flex';
-                this.alt = 'No screenshot';
             };
 
             var info = document.createElement('div');
