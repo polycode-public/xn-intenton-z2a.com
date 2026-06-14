@@ -5,6 +5,13 @@
 **Issue**: https://github.com/polycode-public/agentic-lib/issues/1924
 **Branch**: `claude/showcase`
 
+> **Note (historical design doc):** This is the original showcase plan as
+> written on 2026-03-21. Two things shipped differently from what is described
+> below: chat is now the **marginalia embed** (`marginalia.polycode.co.uk`),
+> not **Giscus**; and each repo's mission file is **`INTENT.md`** (renamed from
+> `MISSION.md`). Read the references to Giscus / `MISSION.md` below with those
+> substitutions in mind. See `README.md` for current reality.
+
 ---
 
 ## User Assertions
