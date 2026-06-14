@@ -9,9 +9,8 @@
 [owner]
 name = "polycode-public"
 
-[[repositories]]
-name = "repository0"
-label = "repository0"
+# repository0 is the template, not a fleet instance — it is reached via the
+# "Create your own" CTA, not listed in the rotating repo-bar.
 
 [[repositories]]
 name = "8-kyu-remember-hello-world"
@@ -20,10 +19,6 @@ label = "hello-world"
 [[repositories]]
 name = "6-kyu-understand-roman-numerals"
 label = "roman-numerals"
-
-[[repositories]]
-name = "4-kyu-apply-cron-engine"
-label = "cron-engine"
 
 [[repositories]]
 name = "3-kyu-analyze-lunar-lander"

@@ -29,7 +29,7 @@ The **home page infrastructure** for intentïon at [xn--intenton-z2a.com](https:
 
 - **Organisation**: `polycode-public` (CI = GitHub Actions; AWS auth = GitHub-OIDC)
 - **Infrastructure**: Single AWS CDK stack (CloudFront + OAC, S3, Route53, CloudWatch Logs)
-- **Chat**: the **marginalia chat embed** — `public/index.html` iframes `https://marginalia.polycode.co.uk/embed.html?seed=<raw summary.json URL>&repo=<owner/slug>`, with the CSP `frame-src` set to `https://marginalia.polycode.co.uk`. The embed runs tier-0 chat on marginalia's shared default graph, seeded client-side from each repo's `agentic-lib-logs/summary.json` on raw.githubusercontent.com (the private graph is never read by the browser). The showcase repo-bar (driven by `public/agentic-lib-repositories.toml`) lists the 5 fleet INTENTs.
+- **Chat**: the **marginalia chat embed** — `public/index.html` iframes `https://marginalia.polycode.co.uk/embed.html?seed=<raw summary.json URL>&repo=<owner/slug>`, with the CSP `frame-src` set to `https://marginalia.polycode.co.uk`. The embed runs tier-0 chat on marginalia's shared default graph, seeded client-side from each repo's `agentic-lib-logs/summary.json` on raw.githubusercontent.com (the private graph is never read by the browser). The showcase repo-bar (driven by `public/agentic-lib-repositories.toml`) lists the 4 live fleet INTENTs; `repository0` (the template) is reached via the "Create your own ↗" CTA, not the repo-bar.
 - **Sensitive file**: `intentïon brand accounts.kdbx` — KeePass database (never commit plaintext secrets)
 
 ## Key Architecture
@@ -81,8 +81,8 @@ source scripts/assume-deployment-role.sh
 
 | Repository | Relationship |
 |------------|-------------|
-| `agentic-lib` | Core SDK — provides the autonomous evolution engine |
-| `repository0` | Template — the experiment this website showcases |
+| `agentic-lib` | The delivery engine (8.0.0 — a one-shot `claude -p` + Bedrock transform) the showcased fleet runs on |
+| `repository0` | The MIT template a fleet repo is cut from; linked from the showcase via the "Create your own" CTA |
 
 ## Git Workflow
 

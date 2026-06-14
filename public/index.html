@@ -177,6 +177,15 @@
             text-decoration: underline;
         }
         #showcase-show-all:hover { font-weight: bold; }
+        #showcase-template-cta {
+            display: block;
+            margin-top: 2px;
+            color: #3F5965;
+            font-size: 0.8em;
+            text-align: right;
+            text-decoration: underline;
+        }
+        #showcase-template-cta:hover { font-weight: bold; }
 
         /* Mission lightbox */
         #mission-lightbox {
@@ -588,20 +597,20 @@
                     // Fallback if toml fails to load
                     console.warn('No repos loaded from toml — using hardcoded fallback');
                     SHOWCASE_REPOS = [
-                        { name: 'repository0', label: 'repository0', repoId: 'R_kgDON6E8ZA', categoryId: 'DIC_kwDON6E8ZM4CpwzM', giscus: true },
+                        { name: '8-kyu-remember-hello-world', label: 'hello-world' },
                     ];
                 }
             })
             .catch(function(err) {
                 console.error('Failed to load repo config:', err);
                 SHOWCASE_REPOS = [
-                    { name: 'repository0', label: 'repository0', repoId: 'R_kgDON6E8ZA', categoryId: 'DIC_kwDON6E8ZM4CpwzM', giscus: true },
+                    { name: '8-kyu-remember-hello-world', label: 'hello-world' },
                 ];
             });
     }
 
     // ─── W2: localStorage for default repo ──────────────────────────
-    var currentDefault = localStorage.getItem('intention-showcase-default') || 'repository0';
+    var currentDefault = localStorage.getItem('intention-showcase-default') || '8-kyu-remember-hello-world';
 
     // ─── Metadata cache ─────────────────────────────────────────────
     var repoMeta = {}; // { repoName: { missionName, missionText, status, transforms, discussionTerm } }
@@ -733,6 +742,17 @@
         showAllBtn.textContent = 'Show all';
         showAllBtn.addEventListener('click', openGridOverlay);
         bar.appendChild(showAllBtn);
+
+        // Template CTA — repository0 is the template, not a fleet instance, so it
+        // is reached here rather than listed as a rotating repo.
+        var templateLink = document.createElement('a');
+        templateLink.id = 'showcase-template-cta';
+        templateLink.href = 'https://github.com/' + OWNER + '/repository0';
+        templateLink.target = '_blank';
+        templateLink.rel = 'noopener';
+        templateLink.textContent = 'Create your own ↗';
+        templateLink.title = 'Use the repository0 template to start your own intentïon repo';
+        bar.appendChild(templateLink);
     }
 
     // ─── W5 + W10: Unified switchDefault ────────────────────────────
