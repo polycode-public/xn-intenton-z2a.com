@@ -24,7 +24,7 @@
         <cdk.version>2.259.0</cdk.version>
         <constructs.version>10.6.0</constructs.version>
         <junit.version>5.14.4</junit.version>
-        <junit-platform.version>1.14.4</junit-platform.version>
+        <junit-platform.version>6.1.1</junit-platform.version>
     </properties>
 
     <dependencies>
